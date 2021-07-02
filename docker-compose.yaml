@@ -1,0 +1,22 @@
+version: '3.3'
+
+services:
+  db:
+    hostname: db
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=cnadmin
+      - POSTGRES_PASSWORD=cnadmin
+      - POSTGRES_DB=cnadmin
+    ports:
+      - 5432:5432
+
+  fauth:
+    hostname: fauth
+    image: cyphernode/cyphernodefauth:v0.6.0-dev-local
+    restart: always
+    volumes:
+      - /Users/jash/cyphernode/gatekeeper/keys.properties:/keys.properties
+      - /Users/jash/go/src/github.com/schulterklopfer/cyphernode_fauth/api.properties:/api.properties
+      - /Users/jash/src/cyphernode-features_cam/dist/apps:/apps

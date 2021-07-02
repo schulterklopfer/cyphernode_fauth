@@ -1,0 +1,9 @@
+Dockerfile
+.dockerignore
+node_modules
+ui_template
+_dummyWebserver
+ui
+ui_template
+.idea
+docker-compose.yaml

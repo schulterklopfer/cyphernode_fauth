@@ -1,0 +1,702 @@
+openapi: 3.0.0
+info:
+  description: "Cyphernode Admin API"
+  version: "0.1.0"
+  title: "Cyphernode Admin API"
+servers:
+  - url: /api/v0
+    description: authoring
+  - url: http://localhost:8888/api/v0
+    description: local cyphernode admin
+security:
+  - BearerAuth: []
+tags:
+  - name: "cyphernode"
+    description: "Everything bitcoin"
+    externalDocs:
+      description: "Find out more"
+      url: "http://cyphernode.io"
+  - name: "openapi generator"
+    externalDocs:
+      description: "Find out more"
+      url: "https://github.com/OpenAPITools/openapi-generator"
+paths:
+  /users/:
+    get:
+      summary: "List all users"
+      operationId: "findUsers"
+      parameters:
+        - in: "query"
+          name: "login_like"
+          schema:
+            type: "string"
+          description: "search for login"
+        - in: "query"
+          name: "name_like"
+          schema:
+            type: "string"
+          description: "search for name"
+        - in: "query"
+          name: "email_address_like"
+          schema:
+            type: "string"
+          description: "search for email address"
+        - in: "query"
+          name: "_page"
+          schema:
+            type: "integer"
+          description: "page of paged list"
+        - in: "query"
+          name: "_limit"
+          schema:
+            type: "integer"
+          description: "size of paged list"
+        - in: "query"
+          name: "_sort"
+          schema:
+            type: "string"
+            enum: ["id","name","emailAddress","login"]
+          description: "field to sort by"
+        - in: "query"
+          name: "_order"
+          schema:
+            type: string
+            enum: ["ASC","DESC"]
+          description: "sort order"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedUsers'
+        '403':
+          description: "Access token is missing or invalid"
+        '500':
+          description: "Internal server error"
+    post:
+      summary: "Create new user"
+      operationId: "createUser"
+      requestBody:
+        description: "user to be created"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+            example:
+              login: "newUser"
+              password: "test123"
+              email_address: "user@user.com"
+              roles:
+                - ID: 1
+                - ID: 2
+      responses:
+        '201':
+          description: "successfully created"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          headers:
+            X-Status-Reason:
+              schema:
+                type: "string"
+          description: "Bad request"
+        '403':
+          description: "Access token is missing or invalid"
+        '500':
+          description: "Internal server error"
+  /users/{userId}:
+    get:
+      summary: "get users"
+      operationId: "getUser"
+      parameters:
+        - in: "path"
+          required: true
+          name: userId
+          schema:
+            type: "integer"
+      responses:
+        '200':
+          description: "success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '403':
+          description: "Access token is missing or invalid"
+        '404':
+          description: "Not found"
+        '500':
+          description: "Internal server error"
+    patch:
+      summary: "patch user"
+      operationId: "patchUser"
+      parameters:
+        - in: "path"
+          required: true
+          name: userId
+          schema:
+            type: "integer"
+            minimum: 1
+      requestBody:
+        description: "Fields to be patched"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+            example:
+              email_address: "new_eamil@user.com"
+      responses:
+        '200':
+          description: "success"
+        '400':
+          headers:
+            X-Status-Reason:
+              schema:
+                type: "string"
+          description: "Bad request"
+        '403':
+          description: "Access token is missing or invalid"
+        '404':
+          description: "Not found"
+        '500':
+          description: "Internal server error"
+    put:
+      summary: "update user"
+      operationId: "updateUser"
+      parameters:
+        - in: "path"
+          required: true
+          name: userId
+          schema:
+            type: "integer"
+            minimum: 1
+      requestBody:
+        description: "User data to replace the old data"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+            example:
+              login: "otherUser"
+              password: "test4321"
+              email_address: "new_eamil@user.com"
+              roles:
+                - ID: 3
+                - ID: 4
+      responses:
+        '200':
+          description: "success"
+        '400':
+          headers:
+            X-Status-Reason:
+              schema:
+                type: "string"
+          description: "Bad request"
+        '403':
+          description: "Access token is missing or invalid"
+        '404':
+          description: "Not found"
+        '500':
+          description: "Internal server error"
+    delete:
+      summary: "delete user"
+      operationId: "deleteUser"
+      parameters:
+        - in: "path"
+          required: true
+          name: userId
+          schema:
+            type: "integer"
+            minimum: 1
+      responses:
+        '204':
+          description: "success, no content"
+        '400':
+          headers:
+            X-Status-Reason:
+              schema:
+                type: "string"
+          description: "Bad request"
+        '403':
+          description: "Access token is missing or invalid"
+        '404':
+          description: "Not found"
+        '500':
+          description: "Internal server error"
+  /users/{userId}/roles/:
+    post:
+      summary: "add roles to user"
+      operationId: "addRolesToUser"
+      parameters:
+        - in: "path"
+          required: true
+          name: userId
+          schema:
+            type: "integer"
+      requestBody:
+        description: "Roles to be added"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                type: "object"
+                required:
+                  - "ID"
+                properties:
+                  ID:
+                    type: "integer"
+                    minimum: 1
+            example:
+              - ID: 1
+              - ID: 2
+      responses:
+        '200':
+          description: "success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          headers:
+            X-Status-Reason:
+              schema:
+                type: "string"
+          description: "Bad request"
+        '403':
+          description: "Access token is missing or invalid"
+        '404':
+          description: "Not found"
+        '500':
+          description: "Internal server error"
+  /users/{userId}/roles/{roleId}:
+    delete:
+      summary: "remove roles from user"
+      operationId: "removeRoleFromUser"
+      parameters:
+        - in: "path"
+          required: true
+          name: userId
+          schema:
+            type: "integer"
+            minimum: 1
+        - in: "path"
+          required: true
+          name: roleId
+          schema:
+            type: "integer"
+            minimum: 1
+      responses:
+        '204':
+          description: "success, no content"
+        '400':
+          headers:
+            X-Status-Reason:
+              schema:
+                type: "string"
+          description: "Bad request"
+        '403':
+          description: "Access token is missing or invalid"
+        '404':
+          description: "Not found"
+        '500':
+          description: "Internal server error"
+  /apps/:
+    get:
+      summary: "List all apps"
+      operationId: "findApps"
+      parameters:
+        - in: "query"
+          name: "name_like"
+          schema:
+            type: "string"
+          description: "search for name"
+        - in: "query"
+          name: "_page"
+          schema:
+            type: "integer"
+          description: "page of paged list"
+        - in: "query"
+          name: "_limit"
+          schema:
+            type: "integer"
+          description: "size of paged list"
+        - in: "query"
+          name: "_sort"
+          schema:
+            type: "string"
+            enum: ["id","name"]
+          description: "field to sort by"
+        - in: "query"
+          name: "_order"
+          schema:
+            type: string
+            enum: ["ASC","DESC"]
+          description: "sort order"
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedApps'
+        '403':
+          description: "Access token is missing or invalid"
+        '500':
+          description: "Internal server error"
+    post:
+      summary: "Create new app"
+      operationId: "createApp"
+      requestBody:
+        description: "app to be created"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/App'
+            example:
+              name: "newApp"
+              hash: "12345678901234567890123456789012"
+              roles:
+                - name: "admin"
+                  description: "app admin"
+                  autoAssign: false
+                - name: "user"
+                  description: "regular user"
+                  autoAssign: true
+      responses:
+        '201':
+          description: "successfully created"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '400':
+          headers:
+            X-Status-Reason:
+              schema:
+                type: "string"
+          description: "Bad request"
+        '403':
+          description: "Access token is missing or invalid"
+        '500':
+          description: "Internal server error"
+  /apps/{appId}:
+    get:
+      summary: "get app"
+      operationId: "getApp"
+      parameters:
+        - in: "path"
+          required: true
+          name: appId
+          schema:
+            type: "integer"
+      responses:
+        '200':
+          description: "success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '403':
+          description: "Access token is missing or invalid"
+        '404':
+          description: "Not found"
+        '500':
+          description: "Internal server error"
+    patch:
+      summary: "patch app"
+      operationId: "patchApp"
+      parameters:
+        - in: "path"
+          required: true
+          name: appId
+          schema:
+            type: "integer"
+            minimum: 1
+      requestBody:
+        description: "Fields to be patched"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/App'
+            example:
+              name: "new_name"
+      responses:
+        '200':
+          description: "success"
+        '400':
+          headers:
+            X-Status-Reason:
+              schema:
+                type: "string"
+          description: "Bad request"
+        '403':
+          description: "Access token is missing or invalid"
+        '404':
+          description: "Not found"
+        '500':
+          description: "Internal server error"
+    put:
+      summary: "update app"
+      operationId: "updateApp"
+      parameters:
+        - in: "path"
+          required: true
+          name: appId
+          schema:
+            type: "integer"
+            minimum: 1
+      requestBody:
+        description: "app data to replace the old data"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/App'
+            example:
+              name: "otherApp"
+              hash: "12345678901234567890123456789012"
+              description: "nice app"
+              roles:
+                - name: "admin"
+                  description: "new app admin"
+                  autoAssign: false
+                - name: "user"
+                  description: "new regular user"
+                  autoAssign: true
+      responses:
+        '200':
+          description: "success"
+        '400':
+          headers:
+            X-Status-Reason:
+              schema:
+                type: "string"
+          description: "Bad request"
+        '403':
+          description: "Access token is missing or invalid"
+        '404':
+          description: "Not found"
+        '500':
+          description: "Internal server error"
+    delete:
+      summary: "delete app"
+      operationId: "deleteApp"
+      parameters:
+        - in: "path"
+          required: true
+          name: appId
+          schema:
+            type: "integer"
+            minimum: 1
+      responses:
+        '204':
+          description: "success, no content"
+        '400':
+          headers:
+            X-Status-Reason:
+              schema:
+                type: "string"
+          description: "Bad request"
+        '403':
+          description: "Access token is missing or invalid"
+        '404':
+          description: "Not found"
+        '500':
+          description: "Internal server error"
+  /apps/{appId}/roles/:
+    post:
+      summary: "add available roles to app"
+      operationId: "addRolesToApp"
+      parameters:
+        - in: "path"
+          required: true
+          name: appId
+          schema:
+            type: "integer"
+      requestBody:
+        description: "Roles to be added"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                $ref: '#/components/schemas/Role'
+            example:
+              - name: "admin"
+                description: "new app admin"
+                autoAssign: false
+              - name: "user"
+                description: "new regular user"
+                autoAssign: true
+      responses:
+        '200':
+          description: "success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '400':
+          headers:
+            X-Status-Reason:
+              schema:
+                type: "string"
+          description: "Bad request"
+        '403':
+          description: "Access token is missing or invalid"
+        '404':
+          description: "Not found"
+        '500':
+          description: "Internal server error"
+  /apps/{appId}/roles/{roleId}:
+    delete:
+      summary: "remove roles from user"
+      operationId: "removeRoleFromApp"
+      parameters:
+        - in: "path"
+          required: true
+          name: appId
+          schema:
+            type: "integer"
+            minimum: 1
+        - in: "path"
+          required: true
+          name: roleId
+          schema:
+            type: "integer"
+            minimum: 1
+      responses:
+        '204':
+          description: "success, no content"
+        '400':
+          headers:
+            X-Status-Reason:
+              schema:
+                type: "string"
+          description: "Bad request"
+        '403':
+          description: "Access token is missing or invalid"
+        '404':
+          description: "Not found"
+        '500':
+          description: "Internal server error"
+components:
+  schemas:
+    App:
+      type: "object"
+      required:
+        - "hash"
+        - "name"
+      properties:
+        ID:
+          type: "integer"
+          minimum: 1
+          example: 1
+        hash:
+          type: "string"
+          pattern: "^[a-fA-F0-9]{32}$"
+        name:
+          type: "string"
+          minLength: 3
+          maxLength: 30
+          pattern: "^[a-zA-Z0-9_\\-]+$"
+        description:
+          type: string
+          maxLength: 255
+        availableRoles:
+          type: "array"
+          items:
+            $ref: '#/components/schemas/Role'
+    User:
+      type: "object"
+      required:
+        - "login"
+        - "email_address"
+      properties:
+        ID:
+          type: "integer"
+          minimum: 1
+          example: 1
+        login:
+          type: "string"
+          minLength: 3
+          maxLength: 30
+          pattern: "^[a-zA-Z0-9_\\-]+$"
+        name:
+          type: string
+          maxLength: 255
+        password:
+          type: "string"
+          format: "password"
+          maxLength: 128
+        email_address:
+          type: "string"
+          format: "email"
+          maxLength: 100
+        roles:
+          type: "array"
+          items:
+            $ref: '#/components/schemas/Role'
+    Role:
+      type: "object"
+      required:
+        - "name"
+        - "appId"
+      properties:
+        ID:
+          type: "integer"
+          minimum: 1
+          example: 1
+        name:
+          type: "string"
+          minLength: 3
+          maxLength: 30
+          pattern: "^[a-zA-Z0-9_\\-]+$"
+        description:
+          type: "string"
+          maxLength: 255
+        autoAssign:
+          type: "boolean"
+          default: false
+        appId:
+          type: "integer"
+          minimum: 1
+          example: 1
+    PagedUsers:
+      type: "object"
+      required:
+        - "page"
+        - "limit"
+        - "sort"
+        - "total"
+        - "data"
+      properties:
+        page:
+          type: "integer"
+        limit:
+          type: "integer"
+        sort:
+          type: "string"
+          enum: ["id","name","emailAddress","login"]
+        order:
+          type: "string"
+          enum: ["ASC","DESC"]
+        data:
+          type: "array"
+          items:
+            $ref: '#/components/schemas/User'
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
