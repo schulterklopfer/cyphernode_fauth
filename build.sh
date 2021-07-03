@@ -24,4 +24,4 @@
 # SOFTWARE.
 #
 
-docker build . -t cyphernode/cyphernodefauth:v0.6.0-dev-local --progress=plain
+docker build . -t cyphernode/cyphernodefauth:v0.7.0-dev-local --progress=plain
