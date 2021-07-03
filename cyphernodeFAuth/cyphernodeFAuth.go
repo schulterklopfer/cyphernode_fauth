@@ -27,6 +27,7 @@ package cyphernodeFAuth
 import (
   "github.com/gin-gonic/gin"
   "github.com/schulterklopfer/cyphernode_fauth/appList"
+  "github.com/schulterklopfer/cyphernode_fauth/cyphernodeKeys"
   "github.com/schulterklopfer/cyphernode_fauth/dataSource"
   "github.com/schulterklopfer/cyphernode_fauth/globals"
   "github.com/schulterklopfer/cyphernode_fauth/helpers"
@@ -68,6 +69,16 @@ func (cyphernodeFAuth *CyphernodeFAuth) Init() error {
   err := dataSource.Init(cyphernodeFAuth.Config.DatabaseDsn)
   if err != nil {
     logwrapper.Logger().Error("Failed to connect to database" )
+    return err
+  }
+
+  err = cyphernodeKeys.Init(
+    helpers.GetenvOrDefault( globals.KEYS_FILE_ENV_KEY ),
+    helpers.GetenvOrDefault( globals.ACTIONS_FILE_ENV_KEY ),
+  )
+
+  if err != nil {
+    logwrapper.Logger().Error("Failed to load cyphernode keys and api info" )
     return err
   }
 
