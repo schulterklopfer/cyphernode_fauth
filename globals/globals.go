@@ -24,13 +24,9 @@
 
 package globals
 
-const VERSION = "v0.1.0"
+import "errors"
 
-const SESSION_COOKIE_NAME string = "cna_session"
-const BLOCKCHAIN_INFO_UPDATE_INTERVAL = 1000 * 60
-const DOCKER_API_UPDATE_INTERVAL = 1000 * 5
-const DOCKER_LOGS_MAX_LINES = 512
-const LATEST_BLOCK_COUNT = 3
+const VERSION = "v0.1.0"
 
 /** env keys **/
 const BASE_URL_EXTERNAL_ENV_KEY string = "BASE_URL_EXTERNAL"
@@ -54,15 +50,6 @@ const KEYS_FILE_ENV_KEY = "CYPHERNODE_KEYS_FILE"
 const ACTIONS_FILE_ENV_KEY = "CYPHERNODE_ACTIONS_FILE"
 const CERT_FILE_ENV_KEY = "CYPHERNODE_CERT_FILE"
 
-/** router groups endpoint bases **/
-const BASE_ENDPOINT_PUBLIC string = ""
-const BASE_ENDPOINT_USERS string = "/api/v0/users"
-const BASE_ENDPOINT_DOCKER string = "/api/v0/docker"
-const BASE_ENDPOINT_BLOCKS string = "/api/v0/blocks"
-const BASE_ENDPOINT_APPS string = "/api/v0/apps"
-const BASE_ENDPOINT_SESSIONS string = "/api/v0/sessions"
-const BASE_ENDPOINT_STATUS string = "/api/v0/status"
-const BASE_ENDPOINT_FILES string = "/api/v0/files"
 
 const BASE_ADMIN_MOUNTPOINT string = "admin"
 
@@ -70,37 +57,13 @@ const BASE_ADMIN_MOUNTPOINT string = "admin"
 const FORWARD_AUTH_ENDPOINTS_AUTH = "/public"
 const PROXY_GATEKEEPER_ENDPOINTS_AUTH = "/gatekeeper"
 
-const PUBLIC_ENDPOINTS_LOGIN string = "/api/v0/login"
-const PRIVATE_ENDPOINTS_LOGOUT string = "/api/v0/logout"
-
 const UNAUTHORIZED_REDIRECT_URL string = "/admin"
 
 const CYPHERAPPS_REPO string = "git://github.com/SatoshiPortal/cypherapps.git"
 
-/** sql statements **/
-const SQL_STATEMENTS__ROLES_BY_USER_ID_AND_APP_ID string = "SELECT " +
-    "role_models.id as id, " +
-    "role_models.app_id as app_id, " +
-    "role_models.auto_assign as auto_assign, " +
-    "role_models.name as name, " +
-    "role_models.description as description, " +
-    "role_models.created_at as created_at, " +
-    "role_models.updated_at as updated_at, " +
-    "role_models.deleted_at as deleted_at " +
-    "FROM role_models " +
-    "JOIN user_roles " +
-    "ON role_models.id = user_roles.role_model_id " +
-    "WHERE user_roles.user_model_id = ? " +
-    "AND role_models.app_id = ?"
-
-/** roles **/
-const ROLES_ADMIN_ROLE = "admin"
 
 /** useful vars **/
-
 var ENDPOINTS_PUBLIC_PATTERNS = [...]string{".*/+favicon.ico$"}
-
-var PROTECTED_ROUTER_GROUPS_INDICES = [...]int{2, 3, 4}
 
 /** defaults **/
 
@@ -125,3 +88,15 @@ var DEFAULTS = map[string]string{
   GATEKEEPER_PORT_ENV_KEY:         "2009",
   CNA_SESSION_COOKIE_NAME_ENV_KEY: "io.cyphernode.session",
 }
+
+
+var ErrDuplicateUser = errors.New("user already exists")
+var ErrUserHasUnknownRole = errors.New("user has unknown role")
+var ErrNoSuchUser = errors.New( "no such user" )
+var ErrNoSuchRole = errors.New( "no such role" )
+var ErrCannotAddExistingRole = errors.New( "cannot add existing role to app" )
+var ErrUserAlreadyHasRole = errors.New( "user already has role" )
+var ErrNoSuchApp = errors.New( "no such app" )
+var ErrMigrationFailed = errors.New( "migration failed" )
+var ErrDatabaseNotInitialised = errors.New( "database not initialised")
+var ErrActionForbidden = errors.New( "action forbidden" )

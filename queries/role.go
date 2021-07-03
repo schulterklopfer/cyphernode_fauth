@@ -26,8 +26,8 @@ package queries
 
 import (
   "errors"
-  "github.com/schulterklopfer/cyphernode_fauth/cnaErrors"
   "github.com/schulterklopfer/cyphernode_fauth/dataSource"
+  "github.com/schulterklopfer/cyphernode_fauth/globals"
   "github.com/schulterklopfer/cyphernode_fauth/models"
   "gopkg.in/validator.v2"
 )
@@ -53,7 +53,7 @@ func DeleteRole( id uint ) error {
     return errors.New("no such role")
   }
   if id == 1 {
-    return cnaErrors.ErrActionForbidden
+    return globals.ErrActionForbidden
   }
   db := dataSource.GetDB()
   var role models.RoleModel

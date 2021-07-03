@@ -26,8 +26,8 @@ package queries
 
 import (
   "errors"
-  "github.com/schulterklopfer/cyphernode_fauth/cnaErrors"
   "github.com/schulterklopfer/cyphernode_fauth/dataSource"
+  "github.com/schulterklopfer/cyphernode_fauth/globals"
   "github.com/schulterklopfer/cyphernode_fauth/models"
   "gopkg.in/validator.v2"
 )
@@ -59,7 +59,7 @@ func DeleteApp( id uint ) error {
     return errors.New("no such app")
   }
   if id == 1 {
-    return cnaErrors.ErrActionForbidden
+    return globals.ErrActionForbidden
   }
   db := dataSource.GetDB()
   var app models.AppModel
@@ -73,7 +73,7 @@ func DeleteApp( id uint ) error {
 
 func RemoveRoleFromApp(  app *models.AppModel, roleId uint ) error {
   if roleId == 1 && app.ID == 1 {
-    return cnaErrors.ErrActionForbidden
+    return globals.ErrActionForbidden
   }
   //db := dataSource.GetDB()
 
@@ -86,7 +86,7 @@ func RemoveRoleFromApp(  app *models.AppModel, roleId uint ) error {
   }
 
   if role.ID == 0 || role.AppId != app.ID {
-    return cnaErrors.ErrNoSuchRole
+    return globals.ErrNoSuchRole
   }
 
   //db.Model(app).Association("AvailableRoles").Delete( role )
@@ -97,7 +97,7 @@ func CreateRoleForApp( app *models.AppModel, role *models.RoleModel ) error {
   db := dataSource.GetDB()
 
   if role.ID != 0 {
-    return cnaErrors.ErrCannotAddExistingRole
+    return globals.ErrCannotAddExistingRole
   }
 
   db.Model(app).Association("AvailableRoles").Append( role )
@@ -133,7 +133,7 @@ func GetAppByMountPoint( mountPoint string ) (*models.AppModel, error) {
   }
 
   if len(apps) == 0 {
-    return nil, cnaErrors.ErrNoSuchApp
+    return nil, globals.ErrNoSuchApp
   }
 
   err = LoadRoles( apps[0] )

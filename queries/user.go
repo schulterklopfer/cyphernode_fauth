@@ -25,8 +25,8 @@
 package queries
 
 import (
-  "github.com/schulterklopfer/cyphernode_fauth/cnaErrors"
   "github.com/schulterklopfer/cyphernode_fauth/dataSource"
+  "github.com/schulterklopfer/cyphernode_fauth/globals"
   "github.com/schulterklopfer/cyphernode_fauth/models"
   "gopkg.in/validator.v2"
 )
@@ -68,10 +68,10 @@ func UpdateUser( user *models.UserModel ) error {
 
 func DeleteUser( id uint ) error {
   if id == 0 {
-    return cnaErrors.ErrNoSuchUser
+    return globals.ErrNoSuchUser
   }
   if id == 1 {
-    return cnaErrors.ErrActionForbidden
+    return globals.ErrActionForbidden
   }
   db := dataSource.GetDB()
   var user models.UserModel
@@ -81,7 +81,7 @@ func DeleteUser( id uint ) error {
 
 func RemoveRoleFromUser(  user *models.UserModel, roleId uint ) error {
   if roleId == 1 && user.ID == 1 {
-    return cnaErrors.ErrActionForbidden
+    return globals.ErrActionForbidden
   }
 
   db := dataSource.GetDB()
@@ -95,7 +95,7 @@ func RemoveRoleFromUser(  user *models.UserModel, roleId uint ) error {
   }
 
   if role.ID == 0 {
-    return cnaErrors.ErrNoSuchRole
+    return globals.ErrNoSuchRole
   }
 
   db.Model(&user).Association("Roles").Delete( &role )
@@ -114,12 +114,12 @@ func AddRoleToUser( user *models.UserModel, roleId uint ) error {
   }
 
   if role.ID == 0 {
-    return cnaErrors.ErrNoSuchRole
+    return globals.ErrNoSuchRole
   }
 
   for i:=0; i<len( user.Roles ); i++ {
     if user.Roles[i].ID == roleId {
-      return cnaErrors.ErrUserAlreadyHasRole
+      return globals.ErrUserAlreadyHasRole
     }
   }
 

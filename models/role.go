@@ -26,7 +26,7 @@ package models
 
 import (
   "github.com/jinzhu/gorm"
-  "github.com/schulterklopfer/cyphernode_fauth/cnaErrors"
+  "github.com/schulterklopfer/cyphernode_fauth/globals"
 )
 
 type RoleModel struct {
@@ -45,7 +45,7 @@ func ( role *RoleModel ) AfterDelete( tx *gorm.DB ) {
 func ( role *RoleModel ) BeforeDelete( tx *gorm.DB ) (err error) {
   // very important. if no check, will delete all users if ID == 0
   if role.ID == 0 {
-    err = cnaErrors.ErrNoSuchRole
+    err = globals.ErrNoSuchRole
     return
   }
   return

@@ -25,7 +25,6 @@
 package cyphernodeFAuth
 
 import (
-  "github.com/schulterklopfer/cyphernode_fauth/cnaErrors"
   "github.com/schulterklopfer/cyphernode_fauth/dataSource"
   "github.com/schulterklopfer/cyphernode_fauth/globals"
   "github.com/schulterklopfer/cyphernode_fauth/helpers"
@@ -119,7 +118,7 @@ func (cyphernodeFAuth *CyphernodeFAuth) migrate() error {
       },
     }
     if adminApp.Hash == "" {
-      return cnaErrors.ErrMigrationFailed
+      return globals.ErrMigrationFailed
     }
     tx.Create(adminApp)
   }

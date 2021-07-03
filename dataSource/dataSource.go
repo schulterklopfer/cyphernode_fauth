@@ -25,10 +25,10 @@
 package dataSource
 
 import (
+  "github.com/schulterklopfer/cyphernode_fauth/globals"
   "gorm.io/driver/postgres"
   "gorm.io/gorm"
   //_ "github.com/jinzhu/gorm/dialects/sqlite"
-  "github.com/schulterklopfer/cyphernode_fauth/cnaErrors"
   "github.com/schulterklopfer/cyphernode_fauth/logwrapper"
   "github.com/schulterklopfer/cyphernode_fauth/models"
 )
@@ -78,7 +78,7 @@ func Close() {
 
 func AutoMigrate() error {
   if db == nil {
-    return cnaErrors.ErrDatabaseNotInitialised
+    return globals.ErrDatabaseNotInitialised
   }
   logwrapper.Logger().Info( "Migrating database")
   return db.AutoMigrate(

@@ -31,7 +31,7 @@ import (
   "fmt"
   "github.com/SatoshiPortal/cam/storage"
   "github.com/jinzhu/gorm"
-  "github.com/schulterklopfer/cyphernode_fauth/cnaErrors"
+  "github.com/schulterklopfer/cyphernode_fauth/globals"
 )
 
 type AccessPolicies []*storage.AccessPolicy
@@ -112,7 +112,7 @@ func ( app *AppModel ) AfterDelete( tx *gorm.DB ) {
 func ( app *AppModel ) BeforeDelete( tx *gorm.DB ) (err error) {
   // very important. if no check, will delete all users if ID == 0
   if app.ID == 0 {
-    err = cnaErrors.ErrNoSuchApp
+    err = globals.ErrNoSuchApp
     return
   }
   return

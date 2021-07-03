@@ -26,7 +26,7 @@ package models
 
 import (
   "github.com/jinzhu/gorm"
-  "github.com/schulterklopfer/cyphernode_fauth/cnaErrors"
+  "github.com/schulterklopfer/cyphernode_fauth/globals"
 )
 
 type UserModel struct {
@@ -50,7 +50,7 @@ func (user *UserModel) AfterCreate( tx *gorm.DB ) (err error) {
 func (user *UserModel) BeforeDelete( tx *gorm.DB ) (err error) {
   // very important. if no check, will delete all users if ID == 0
   if user.ID == 0 {
-    err = cnaErrors.ErrNoSuchUser
+    err = globals.ErrNoSuchUser
     return
   }
   return
@@ -90,7 +90,7 @@ func (user *UserModel) checkDuplicate( tx *gorm.DB ) error {
   tx.Limit(1).Find( &existingUsers, "login = ? AND id != ?", user.Login, user.ID )
 
   if len(existingUsers) > 0 {
-    return cnaErrors.ErrDuplicateUser
+    return globals.ErrDuplicateUser
   }
   return nil
 }
@@ -98,12 +98,12 @@ func (user *UserModel) checkDuplicate( tx *gorm.DB ) error {
 func (user *UserModel) checkRoles( tx *gorm.DB ) error {
   for i:=0; i<len(user.Roles ); i++ {
     if user.Roles[i].ID == 0 {
-      return cnaErrors.ErrUserHasUnknownRole
+      return globals.ErrUserHasUnknownRole
     }
     var role RoleModel
     tx.Take( &role,  user.Roles[i].ID )
     if role.ID != user.Roles[i].ID {
-      return cnaErrors.ErrUserHasUnknownRole
+      return globals.ErrUserHasUnknownRole
     }
   }
   return nil
