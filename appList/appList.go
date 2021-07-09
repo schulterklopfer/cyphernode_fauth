@@ -110,7 +110,6 @@ func (appList *AppList) load() error {
     return err
   }
 
-  appList.LastUpate = time.Now()
   return nil
 }
 
