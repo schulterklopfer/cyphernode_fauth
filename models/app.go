@@ -88,12 +88,12 @@ func (meta *Meta) Scan(value interface{}) error {
 
 type AppModel struct {
   gorm.Model
-  Hash           string         `json:"hash" gorm:"type:varchar(32);unique_index;not null"`
-  Secret         string         `json:"-" gorm:"type:varchar(32);unique_index;not null"`
+  Hash           string         `json:"hash" gorm:"type:varchar(64);unique_index;not null"`
+  Secret         string         `json:"-" gorm:"type:varchar(64);unique_index;not null"`
   MountPoint     string         `json:"mountPoint" gorm:"type:varchar(32);unique_index;not null"`
   Name           string         `json:"name" gorm:"type:varchar(30);not null" validate:"min=3,max=30,regexp=^[a-zA-Z0-9_\\- ]+$"`
   Description    string         `json:"description" gorm:"type:varchar(255)"`
-  Version        string         `json:"version" gorm:"type:varchar(255)"`
+  Version        string         `json:"version" gorm:"type:varchar(16)"`
   AvailableRoles []*RoleModel   `json:"availableRoles" gorm:"foreignkey:AppId;preload"`
   AccessPolicies AccessPolicies `json:"accessPolicies,omitempty" gorm:"type:jsonb;default:'null'"`
   Meta           *Meta          `json:"meta,omitempty" gorm:"type:jsonb;default:'null'"`
